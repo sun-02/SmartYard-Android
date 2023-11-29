@@ -57,6 +57,16 @@
                 android:layout_marginEnd="12dp"
                 android:background="@drawable/ic_cctv_enter_fullscreen"
                 android:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/mMute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_marginBottom="12dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/ic_cctv_volume_on_24px"
+                android:visibility="visible" />
         </FrameLayout>
 
 

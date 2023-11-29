@@ -63,6 +63,7 @@ class CCTVViewModel(
     val chosenCamera = state.getLiveData<CCTVData?>(chosenCamera_Key, null)
     var initialThumb: Bitmap? = null
     var stateFullScreen = MutableLiveData<Boolean>()
+    var stateMute = MutableLiveData<Boolean>()
     var closedRangeCalendar = MutableLiveData<Event<ClosedRange<LocalDate>>>()
 
     var endDate: LocalDate = LocalDate.now(ZoneId.of(DataModule.serverTz))
@@ -73,6 +74,10 @@ class CCTVViewModel(
 
     fun fullScreen(flag: Boolean) {
         stateFullScreen.value = flag
+    }
+
+    fun mute(flag: Boolean) {
+        stateMute.value = flag
     }
 
     var currentTabId = ONLINE_TAB_POSITION

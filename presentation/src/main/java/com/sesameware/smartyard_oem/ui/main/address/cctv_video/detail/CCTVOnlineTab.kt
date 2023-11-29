@@ -39,6 +39,7 @@ class CCTVOnlineTab : Fragment(), ExitFullscreenListener {
     private var forceVideoTrack = true  //принудительное использование треков с высоким разрешением
     private val mCCTVViewModel: CCTVViewModel by sharedStateViewModel()
     private var mExoPlayerFullscreen = false
+    private var mExoPlayerMute = false
 
     //для полноэкранного режима
     private var lpVideoWrap: ViewGroup.LayoutParams? = null
@@ -168,6 +169,29 @@ class CCTVOnlineTab : Fragment(), ExitFullscreenListener {
                 }
             }
         }
+
+        mCCTVViewModel.stateMute.observe(
+            viewLifecycleOwner
+        ) {
+            mExoPlayerMute = it
+            if (mCCTVViewModel.currentTabId == CCTVViewModel.ONLINE_TAB_POSITION) {
+                if (it) {
+                    mute()
+                } else {
+                    unMute()
+                }
+            }
+        }
+    }
+
+    private fun unMute() {
+        binding.mMute.background = ContextCompat.getDrawable(requireContext(), R.drawable.ic_cctv_volume_on_24px)
+        mPlayer?.unMute()
+    }
+
+    private fun mute() {
+        binding.mMute.background = ContextCompat.getDrawable(requireContext(), R.drawable.ic_cctv_volume_off_24px)
+        mPlayer?.mute()
     }
 
     private fun createPlayer(
@@ -255,6 +279,10 @@ class CCTVOnlineTab : Fragment(), ExitFullscreenListener {
 
         binding.mFullScreen.setOnClickListener {
             mCCTVViewModel.fullScreen(!mExoPlayerFullscreen)
+        }
+
+        binding.mMute.setOnClickListener {
+            mCCTVViewModel.mute(!mExoPlayerMute)
         }
 
         return player

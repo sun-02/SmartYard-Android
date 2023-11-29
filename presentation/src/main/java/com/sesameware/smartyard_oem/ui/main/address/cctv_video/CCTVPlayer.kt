@@ -2,27 +2,36 @@ package com.sesameware.smartyard_oem.ui.main.address.cctv_video
 
 import android.content.Context
 import android.net.Uri
-import android.provider.ContactsContract.Data
-import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.PlaybackParameters
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Timeline
+import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.mediacodec.MediaCodecUtil
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.exoplayer2.video.VideoSize
 import com.sesameware.data.DataModule
-import com.squareup.moshi.Json
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.FormBody
-import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import org.json.JSONObject
-import org.threeten.bp.*
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
-import java.util.*
+import java.util.Timer
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.fixedRateTimer
 
@@ -38,6 +47,8 @@ abstract class BaseCCTVPlayer {
     abstract fun isPlaying(): Boolean
     abstract fun isIdle(): Boolean
     abstract fun prepareMedia(mediaUrl: String?, from: Long = INVALID_POSITION, mediaDuration: Long = INVALID_DURATION, seekMediaTo: Long = 0L, doPlay: Boolean = false)
+    abstract fun mute()
+    abstract fun unMute()
     abstract fun releasePlayer()
     open var playWhenReady: Boolean = false
 
@@ -65,6 +76,8 @@ open class DefaultCCTVPlayer(private val context: Context, private val forceVide
         set(value) {
             mPlayer?.playWhenReady = value
         }
+
+    private var mCurrentVolume: Float = 1.0f
 
     init {
         createPlayer()
@@ -118,6 +131,16 @@ open class DefaultCCTVPlayer(private val context: Context, private val forceVide
         if (seekMediaTo > 0) {
             mPlayer?.seekTo(seekMediaTo)
         }
+    }
+
+    override fun mute() {
+        mPlayer?.let { mCurrentVolume = it.volume }
+        mPlayer?.volume = 0f
+
+    }
+
+    override fun unMute() {
+        mPlayer?.volume = mCurrentVolume
     }
 
     override fun releasePlayer() {
