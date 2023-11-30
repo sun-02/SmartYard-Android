@@ -349,6 +349,7 @@ class CCTVOnlineTab : Fragment(), ExitFullscreenListener {
 
         Timber.d("__Q__   releasePlayer from onStop")
         releasePlayer()
+        mCCTVViewModel.mute(false)
     }
 
     override fun onPause() {
